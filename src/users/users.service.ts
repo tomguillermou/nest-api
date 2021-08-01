@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { hashSync } from 'bcrypt';
 
 export type User = {
   email: string;
@@ -10,7 +11,7 @@ export class UsersService {
   private readonly users = [
     {
       email: 'test@mail.com',
-      password: 'test',
+      password: hashSync('test', 10),
     },
   ];
 
