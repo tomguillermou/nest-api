@@ -1,21 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { hashSync } from 'bcrypt';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
-export type User = {
-  email: string;
-  password: string;
-};
+import { User, UserDocument } from './user.schema';
 
 @Injectable()
 export class UsersService {
-  private readonly users = [
-    {
-      email: 'test@mail.com',
-      password: hashSync('test', 10),
-    },
-  ];
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+  ) {}
 
-  public async getByEmail(email: string): Promise<User | undefined> {
-    return this.users.find((user) => user.email === email);
+  public async getByEmail(email: string): Promise<User | null> {
+    return this.userModel.findOne({ email }).lean().exec();
   }
 }
