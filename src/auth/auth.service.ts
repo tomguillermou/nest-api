@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compareSync } from 'bcrypt';
 
-import { User, UsersService } from 'src/users/users.service';
+import { User } from 'src/users/user.schema';
+import { UsersService } from 'src/users/users.service';
 
 export type UserCredentials = {
   email: string;
