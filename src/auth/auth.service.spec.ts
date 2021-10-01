@@ -43,7 +43,7 @@ describe('AuthService', () => {
             jest.spyOn(bcrypt, 'compareSync').mockReturnValueOnce(true);
 
             const user = await service.loginUser({ email, password: 'test' });
-            expect(user).toBeDefined();
+            expect(user).not.toBeNull();
             expect(user.email).toBe(email);
         });
 
