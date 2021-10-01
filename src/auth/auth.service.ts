@@ -4,10 +4,7 @@ import { compareSync } from 'bcrypt';
 
 import { User, UsersService } from '@users';
 
-export type UserCredentials = {
-    email: string;
-    password: string;
-};
+type UserCredentials = Pick<User, 'email' | 'password'>;
 
 @Injectable()
 export class AuthService {
