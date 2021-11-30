@@ -17,10 +17,8 @@ export class AuthService {
         const user = await this.usersService.getByEmail(email);
 
         if (user && compareSync(user.password, password)) {
-            delete user.password;
             return user;
         }
-
         return null;
     }
 
