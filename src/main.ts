@@ -14,7 +14,7 @@ async function bootstrap(): Promise<void> {
 
     if (!port) {
         Logger.error('Port number is missing. Application will be closed.');
-        await app.close();
+        process.exit(1);
     }
 
     await app.listen(port);
