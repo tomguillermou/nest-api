@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compareSync } from 'bcrypt';
 
-import { User, UsersService } from '@users';
+import { User, UsersService } from 'src/users';
 
 type UserCredentials = Pick<User, 'email' | 'password'>;
 
