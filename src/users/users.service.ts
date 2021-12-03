@@ -8,7 +8,7 @@ import { User, UserDocument } from './users.schema';
 export class UsersService {
     constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
 
-    public async getByEmail(email: string): Promise<User | null> {
+    public getByEmail(email: string): Promise<User | null> {
         return this.userModel.findOne({ email }).lean().exec();
     }
 }

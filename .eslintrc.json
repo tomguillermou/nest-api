@@ -20,7 +20,6 @@
         "no-constructor-return": "error",
         "no-use-before-define": "error",
 
-        "class-methods-use-this": "error",
         "consistent-return": "error",
         "default-param-last": "error",
         "dot-notation": "error",
