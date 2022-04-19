@@ -1,28 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { compareSync } from 'bcrypt';
+import { Types } from 'mongoose';
 
-import { User, UsersService } from 'src/users';
+import { User, UserService } from 'src/users';
 
 type UserCredentials = Pick<User, 'email' | 'password'>;
 
 @Injectable()
 export class AuthService {
-    constructor(
-        private readonly jwtService: JwtService,
-        private readonly usersService: UsersService,
-    ) {}
+    constructor(private jwtService: JwtService, private userService: UserService) {}
 
-    public async loginUser({ email, password }: UserCredentials): Promise<User | null> {
-        const user = await this.usersService.getByEmail(email);
+    public validateUser({ email, password }: UserCredentials): Promise<User | null> {
+        return this.userService.getByCredentials(email, password);
+    }
 
-        if (user && compareSync(user.password, password)) {
-            return user;
+    public validatePayload(payload: unknown): Promise<User | null> {
+        if (typeof payload === 'string' && Types.ObjectId.isValid(payload)) {
+            return this.userService.getById(Types.ObjectId(payload));
         }
         return null;
     }
 
-    public signUserToken(user: User): string {
-        return this.jwtService.sign(user.email);
+    public getAccessToken(user: User): { access_token: string } {
+        return {
+            access_token: this.jwtService.sign(user.email),
+        };
     }
 }

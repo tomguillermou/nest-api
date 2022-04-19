@@ -1,22 +1,16 @@
-import { Controller, Request, Post, UseGuards } from '@nestjs/common';
-import { Request as ExpressRequest } from 'express';
-
-import { User } from 'src/users';
+import { Controller, Req, Post, UseGuards } from '@nestjs/common';
 
 import { LocalAuthGuard } from './guards';
+import { RequestWithUser } from './interfaces';
 import { AuthService } from './auth.service';
-
-interface RequestWithUser extends ExpressRequest {
-    user: User;
-}
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(private authService: AuthService) {}
 
     @UseGuards(LocalAuthGuard)
     @Post('login')
-    login(@Request() req: RequestWithUser): { jwt: string } {
-        return { jwt: this.authService.signUserToken(req.user) };
+    login(@Req() req: RequestWithUser): { access_token: string } {
+        return this.authService.getAccessToken(req.user);
     }
 }

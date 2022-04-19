@@ -1,3 +1,3 @@
-export { User } from './users.schema';
-export * from './users.module';
-export * from './users.service';
+export * from './user.module';
+export { User } from './user.schema';
+export * from './user.service';

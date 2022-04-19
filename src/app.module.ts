@@ -3,7 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 
 import { AuthModule } from 'src/auth';
-import { UsersModule } from 'src/users';
+import { HealthModule } from 'src/health';
+import { UserModule } from 'src/users';
 
 @Module({
     imports: [
@@ -12,12 +13,12 @@ import { UsersModule } from 'src/users';
             imports: [ConfigModule],
             inject: [ConfigService],
             useFactory: (configService: ConfigService): MongooseModuleOptions => ({
-                uri: configService.get<string>('MONGODB_URL'),
-                dbName: configService.get<string>('MONGODB_DATABASE'),
+                uri: configService.get<string>('MONGODB_URI'),
             }),
         }),
         AuthModule,
-        UsersModule,
+        HealthModule,
+        UserModule,
     ],
 })
 export class AppModule {}
