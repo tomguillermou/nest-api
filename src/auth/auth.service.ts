@@ -3,15 +3,19 @@ import { JwtService } from '@nestjs/jwt';
 import { Types } from 'mongoose';
 
 import { User, UserService } from 'src/users';
-
-type UserCredentials = Pick<User, 'email' | 'password'>;
+import { UserNotFound } from './errors';
 
 @Injectable()
 export class AuthService {
     constructor(private jwtService: JwtService, private userService: UserService) {}
 
-    public validateUser({ email, password }: UserCredentials): Promise<User | null> {
-        return this.userService.getByCredentials(email, password);
+    public async validateUser(email: string, password: string): Promise<User> {
+        const user = await this.userService.getByCredentials(email, password);
+
+        if (!user) {
+            throw new UserNotFound();
+        }
+        return user;
     }
 
     public validatePayload(payload: unknown): Promise<User | null> {
