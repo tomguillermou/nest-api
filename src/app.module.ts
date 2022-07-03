@@ -6,6 +6,8 @@ import { AuthModule } from 'src/auth';
 import { HealthModule } from 'src/health';
 import { UserModule } from 'src/users';
 
+import { AppController } from './app.controller';
+
 @Module({
     imports: [
         ConfigModule.forRoot(),
@@ -14,11 +16,14 @@ import { UserModule } from 'src/users';
             inject: [ConfigService],
             useFactory: (configService: ConfigService): MongooseModuleOptions => ({
                 uri: configService.get<string>('MONGODB_URI'),
+                useUnifiedTopology: true,
+                useNewUrlParser: true,
             }),
         }),
         AuthModule,
         HealthModule,
         UserModule,
     ],
+    controllers: [AppController],
 })
 export class AppModule {}

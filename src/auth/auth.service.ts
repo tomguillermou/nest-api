@@ -3,31 +3,37 @@ import { JwtService } from '@nestjs/jwt';
 import { Types } from 'mongoose';
 
 import { User, UserService } from 'src/users';
-import { UserNotFound } from './errors';
 
 @Injectable()
 export class AuthService {
     constructor(private jwtService: JwtService, private userService: UserService) {}
 
-    public async validateUser(email: string, password: string): Promise<User> {
+    public async getUserFromCredentials(email: string, password: string): Promise<User> {
         const user = await this.userService.getByCredentials(email, password);
 
         if (!user) {
-            throw new UserNotFound();
+            throw new Error('User not found');
         }
         return user;
     }
 
-    public validatePayload(payload: unknown): Promise<User | null> {
-        if (typeof payload === 'string' && Types.ObjectId.isValid(payload)) {
-            return this.userService.getById(Types.ObjectId(payload));
+    public async getUserFromJwtPayload(payload: unknown): Promise<User> {
+        if (!(typeof payload === 'string') || !Types.ObjectId.isValid(payload)) {
+            throw new Error('Invalid payload');
         }
-        return null;
+
+        const userId = new Types.ObjectId(payload);
+        const user = await this.userService.getById(userId);
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+        return user;
     }
 
     public getAccessToken(user: User): { access_token: string } {
         return {
-            access_token: this.jwtService.sign(user.email),
+            access_token: this.jwtService.sign(user._id.toString()),
         };
     }
 }
