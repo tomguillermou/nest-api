@@ -1,39 +1,27 @@
-import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { Types } from 'mongoose';
+import { JwtService } from "@nestjs/jwt"
 
-import { User, UserService } from 'src/users';
+import { UserService } from "../users"
+import { CredentialsDto } from "./dtos/credentials.dto"
 
-@Injectable()
 export class AuthService {
-    constructor(private jwtService: JwtService, private userService: UserService) {}
+  constructor(private _jwtService: JwtService, private _userService: UserService) {}
 
-    public async getUserFromCredentials(email: string, password: string): Promise<User> {
-        const user = await this.userService.getByCredentials(email, password);
+  verifyJwt(token: string): string {
+    const payload = this._jwtService.verify(token)
 
-        if (!user) {
-            throw new Error('User not found');
-        }
-        return user;
+    if (typeof payload !== "string") {
+      throw new Error("Payload must be a string")
+    }
+    return payload
+  }
+
+  async verifyCredentials(credentials: CredentialsDto): Promise<string> {
+    const user = await this._userService.getByCredentials(credentials)
+
+    if (!user) {
+      throw new Error("User not found")
     }
 
-    public async getUserFromJwtPayload(payload: unknown): Promise<User> {
-        if (!(typeof payload === 'string') || !Types.ObjectId.isValid(payload)) {
-            throw new Error('Invalid payload');
-        }
-
-        const userId = new Types.ObjectId(payload);
-        const user = await this.userService.getById(userId);
-
-        if (!user) {
-            throw new Error('User not found');
-        }
-        return user;
-    }
-
-    public getAccessToken(user: User): { access_token: string } {
-        return {
-            access_token: this.jwtService.sign(user._id.toString()),
-        };
-    }
+    return this._jwtService.sign(user._id.toString())
+  }
 }

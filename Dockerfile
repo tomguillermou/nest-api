@@ -1,14 +1,14 @@
 FROM node:14 as build
 WORKDIR /app
 COPY package.json ./
-RUN npm install
+RUN yarn install
 COPY . .
-RUN npm run build
+RUN yarn build
 
 
 FROM node:14 as production
 WORKDIR /app
 COPY package.json ./
-RUN npm install --only=production
+RUN yarn install --production
 COPY --from=build /app/dist ./dist
-CMD ["npm", "run", "start:prod"]
+CMD ["yarn", "start"]
