@@ -1,19 +1,31 @@
-import { Controller, Post, Body, UnauthorizedException } from "@nestjs/common"
+import { Controller, Post, Body, UnauthorizedException, Logger } from "@nestjs/common"
 
 import { AuthService } from "./auth.service"
-import { CredentialsDto } from "./dtos/credentials.dto"
+import { LoginDto } from "./dtos/login.dto"
+import { RegisterDto } from "./dtos/register.dto"
 
 @Controller("auth")
 export class AuthController {
+  private _logger = new Logger(AuthController.name)
+
   constructor(private authService: AuthService) {}
 
   @Post("login")
-  async login(@Body() credentials: CredentialsDto): Promise<string> {
+  async login(@Body() credentials: LoginDto): Promise<string> {
     try {
-      const token = await this.authService.verifyCredentials(credentials)
-
-      return token
+      return await this.authService.login(credentials)
     } catch (error) {
+      this._logger.error(error)
+      throw new UnauthorizedException()
+    }
+  }
+
+  @Post("register")
+  async register(@Body() user: RegisterDto): Promise<string> {
+    try {
+      return await this.authService.register(user)
+    } catch (error) {
+      this._logger.error(error)
       throw new UnauthorizedException()
     }
   }

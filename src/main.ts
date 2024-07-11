@@ -38,6 +38,8 @@ async function bootstrap(): Promise<void> {
     const port = app.get(ConfigService).getOrThrow<string>("PORT")
 
     await app.listen(port)
+
+    logger.log(`Application is listening on port: ${port}`)
   } catch (error) {
     logger.error("Error while bootstrapping, application will shut down.")
     process.exit(1)

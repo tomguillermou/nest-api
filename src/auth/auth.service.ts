@@ -1,10 +1,16 @@
+import { Injectable } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
 
-import { UserService } from "../users"
-import { CredentialsDto } from "./dtos/credentials.dto"
+import { AuthRepository } from "./auth.repository"
+import { LoginDto } from "./dtos/login.dto"
+import { RegisterDto } from "./dtos/register.dto"
 
+@Injectable()
 export class AuthService {
-  constructor(private _jwtService: JwtService, private _userService: UserService) {}
+  constructor(
+    private _authRepository: AuthRepository,
+    private _jwtService: JwtService
+  ) {}
 
   verifyJwt(token: string): string {
     const payload = this._jwtService.verify(token)
@@ -15,13 +21,15 @@ export class AuthService {
     return payload
   }
 
-  async verifyCredentials(credentials: CredentialsDto): Promise<string> {
-    const user = await this._userService.getByCredentials(credentials)
+  async login(params: LoginDto): Promise<string> {
+    const user = await this._authRepository.getByCredentials(params)
 
-    if (!user) {
-      throw new Error("User not found")
-    }
+    return this._jwtService.sign(user.id.toString())
+  }
 
-    return this._jwtService.sign(user._id.toString())
+  async register(params: RegisterDto): Promise<string> {
+    const newUser = await this._authRepository.createOne(params)
+
+    return this._jwtService.sign(newUser.id.toString())
   }
 }
