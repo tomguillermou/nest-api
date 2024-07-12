@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
 
-import { User } from "../user"
-import { Token } from "./types/token"
+import { User } from "../../user"
+import { Token } from "../types/token"
 
 @Injectable()
 export class TokenService {
@@ -22,7 +22,7 @@ export class TokenService {
     const parsedPayload = Number.parseInt(payload, 10)
 
     if (Number.isNaN(parsedPayload)) {
-      throw new Error("Invalid payload format")
+      throw new Error("Error parsing payload")
     }
 
     return parsedPayload

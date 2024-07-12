@@ -2,7 +2,7 @@ import { Request } from "express"
 
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common"
 
-import { TokenService } from "./token.service"
+import { TokenService } from "./services/token.service"
 
 function extractTokenFromRequest(request: Request): string | undefined {
   const [type, token] = request.headers.authorization?.split(" ") ?? []

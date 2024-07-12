@@ -2,14 +2,14 @@ import { Module } from "@nestjs/common"
 import { ConfigModule, ConfigService } from "@nestjs/config"
 import { JwtModule, JwtModuleOptions } from "@nestjs/jwt"
 
-import { EncryptionModule } from "../encryption"
 import { UserModule } from "../user"
 import { AuthController } from "./auth.controller"
-import { AuthService } from "./auth.service"
+import { AuthService } from "./services/auth.service"
+import { EncryptionService } from "./services/encryption.service"
+import { TokenService } from "./services/token.service"
 
 @Module({
   imports: [
-    EncryptionModule,
     UserModule,
     ConfigModule.forRoot(),
     JwtModule.registerAsync({
@@ -21,6 +21,6 @@ import { AuthService } from "./auth.service"
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, EncryptionService, TokenService],
 })
 export class AuthModule {}
