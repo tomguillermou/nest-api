@@ -1,29 +1,21 @@
 import { Injectable } from "@nestjs/common"
-import { JwtService } from "@nestjs/jwt"
 
 import { EncryptionService } from "../encryption"
 import { UserRepository } from "../user"
 import { LoginDto } from "./dtos/login.dto"
 import { RegisterDto } from "./dtos/register.dto"
+import { TokenService } from "./token.service"
+import { Token } from "./types/token"
 
 @Injectable()
 export class AuthService {
   constructor(
     private _userRepository: UserRepository,
     private _encryptionService: EncryptionService,
-    private _jwtService: JwtService
+    private _tokenService: TokenService
   ) {}
 
-  verifyJwt(token: string): string {
-    const payload = this._jwtService.verify(token)
-
-    if (typeof payload !== "string") {
-      throw new Error("Payload must be a string")
-    }
-    return payload
-  }
-
-  async login(params: LoginDto): Promise<string> {
+  async login(params: LoginDto): Promise<Token> {
     const user = await this._userRepository.getByEmail(params.email)
     const isValidPassword = this._encryptionService.compare(params.password, user.password)
 
@@ -31,10 +23,10 @@ export class AuthService {
       throw new Error("Invalid credentials")
     }
 
-    return this._jwtService.sign(user.id.toString())
+    return this._tokenService.sign(user.id)
   }
 
-  async register(params: RegisterDto): Promise<string> {
+  async register(params: RegisterDto): Promise<Token> {
     const hashedPassword = this._encryptionService.hash(params.password)
 
     const newUser = await this._userRepository.createOne({
@@ -42,6 +34,6 @@ export class AuthService {
       password: hashedPassword,
     })
 
-    return this._jwtService.sign(newUser.id.toString())
+    return this._tokenService.sign(newUser.id)
   }
 }

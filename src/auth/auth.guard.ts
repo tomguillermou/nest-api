@@ -2,7 +2,7 @@ import { Request } from "express"
 
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common"
 
-import { AuthService } from "./auth.service"
+import { TokenService } from "./token.service"
 
 function extractTokenFromRequest(request: Request): string | undefined {
   const [type, token] = request.headers.authorization?.split(" ") ?? []
@@ -12,7 +12,7 @@ function extractTokenFromRequest(request: Request): string | undefined {
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private _authService: AuthService) {}
+  constructor(private _tokenService: TokenService) {}
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest()
@@ -23,9 +23,7 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const userId = this._authService.verifyJwt(token)
-
-      request.userId = userId
+      request.userId = this._tokenService.verify(token)
 
       return true
     } catch (error) {
