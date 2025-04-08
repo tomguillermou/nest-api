@@ -1,0 +1,39 @@
+name: Evergreen
+
+on:
+  # schedule:
+  # - cron: "* * * * *"
+  workflow_dispatch:
+
+jobs:
+  evergreen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install packages
+        run: yarn install --force
+
+      - name: Check for yarn.lock changes
+        id: check_yarn_lock
+        run: |
+          git fetch origin master
+
+          if git diff --name-only origin/master | grep -q "yarn.lock"; then
+            echo "yarn_lock_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "yarn_lock_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        if: steps.check_yarn_lock.outputs.yarn_lock_changed == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          title: Update packages
+          branch: automatic-package-updater
+          base: master
+          commit-message: Update packages
+          delete-branch: false
+          assignees: tomguillermou
+          reviewers: tomguillermou
